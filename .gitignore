@@ -1,0 +1,9 @@
+.env
+data/
+ad_hoc/
+*.json
+service_account.json
+__pycache__/
+*.pyc
+order_fufillment_log.txt
+.venv

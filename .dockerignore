@@ -1,0 +1,4 @@
+ad_hoc/
+.env
+data/
+*.json
