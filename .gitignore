@@ -7,3 +7,4 @@ __pycache__/
 *.pyc
 order_fufillment_log.txt
 .venv
+*.gpg

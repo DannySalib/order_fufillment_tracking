@@ -1,6 +1,7 @@
 
 from dotenv import load_dotenv
 import logging
+import os 
 import sys
 load_dotenv()
 
@@ -12,6 +13,9 @@ from order_gsheet.order_updater import update_priorities
 from order_data_fetcher import get_order_items
 
 from datetime import datetime
+import smtplib
+from email.message import EmailMessage
+
 TAB = "Order Management"
 
 # Configure root logger to output to stdout
@@ -23,6 +27,16 @@ logging.basicConfig(
 
 LOG_FILE = 'order_fufillment_log.txt'
 
+def notify_email(body: str) -> None:
+    msg = EmailMessage()
+    msg["Subject"] = "Order sync failed"
+    msg["From"] = os.environ["SMTP_USER"]
+    msg["To"] = os.environ["ALERT_TO"]
+    msg.set_content(body)
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as s:
+        s.login(os.environ["SMTP_USER"], os.environ["SMTP_APP_PASSWORD"])
+        s.send_message(msg)
+
 def main():
     setup()
 
@@ -33,11 +47,13 @@ def main():
                     f.write(f"Added transaction {itm.transaction_id} @ {datetime.now()}\n")
             except Exception as e:
                 f.write(f"Could not add order: {e}\n")
+                notify_email(str(e))
 
         try:
             update_priorities()
         except Exception as e:
             f.write(f"Could not update priorities: {e}\n")
+            notify_email(str(e))
         
 
 
